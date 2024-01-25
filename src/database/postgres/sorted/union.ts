@@ -80,7 +80,7 @@ WITH A AS (SELECT z."value",
             INNER JOIN "legacy_zset" z
                     ON o."_key" = z."_key"
                    AND o."type" = z."type"
-            GROUP BY z."value")
+            GROUP BY z."value") 
 SELECT A."value",
        A."score"
   FROM A
