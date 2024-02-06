@@ -24,10 +24,11 @@ interface SortedSetResult {
 
 export = function (module: Module): void {
     module.sortedSetUnionCard = async function (keys: string[]): Promise<number> {
-        if (!Array.isArray(keys) || !keys.length) {
+        if (!Array.isArray(keys) || keys.length === 0) {
             return 0;
         }
 
+    
         const res: QueryResult = await module.pool.query({
             name: 'sortedSetUnionCard',
             text: `
@@ -39,8 +40,9 @@ AND o."type" = z."type"
 WHERE o."_key" = ANY($1::TEXT[])`,
             values: [keys],
         });
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        return res.rows[0]?.c as number;
+
+        return res.rows[0]?.c || 0;
+
     };
 
 

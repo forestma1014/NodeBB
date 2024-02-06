@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,119 +8,83 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 module.exports = function (module) {
     module.sortedSetUnionCard = function (keys) {
-        return __awaiter(this, void 0, void 0, function () {
-            var res;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (!Array.isArray(keys) || !keys.length) {
-                            return [2 /*return*/, 0];
-                        }
-                        return [4 /*yield*/, module.pool.query({
-                                name: 'sortedSetUnionCard',
-                                text: "\nSELECT COUNT(DISTINCT z.\"value\") c\n  FROM \"legacy_object_live\" o\n INNER JOIN \"legacy_zset\" z\n         ON o.\"_key\" = z.\"_key\"\n        AND o.\"type\" = z.\"type\"\n WHERE o.\"_key\" = ANY($1::TEXT[])",
-                                values: [keys]
-                            })];
-                    case 1:
-                        res = _a.sent();
-                        return [2 /*return*/, res.rows[0].c];
-                }
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!Array.isArray(keys) || !keys.length) {
+                return 0;
+            }
+            const res = yield module.pool.query({
+                name: 'sortedSetUnionCard',
+                text: `
+SELECT COUNT(DISTINCT z."value") c
+FROM "legacy_object_live" o
+INNER JOIN "legacy_zset" z
+ON o."_key" = z."_key"
+AND o."type" = z."type"
+WHERE o."_key" = ANY($1::TEXT[])`,
+                values: [keys],
             });
-        });
-    };
-    module.getSortedSetUnion = function (params) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        params.sort = 1;
-                        return [4 /*yield*/, getSortedSetUnion(params)];
-                    case 1: return [2 /*return*/, _a.sent()];
-                }
-            });
-        });
-    };
-    module.getSortedSetRevUnion = function (params) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        params.sort = -1;
-                        return [4 /*yield*/, getSortedSetUnion(params)];
-                    case 1: return [2 /*return*/, _a.sent()];
-                }
-            });
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            return (_a = res.rows[0]) === null || _a === void 0 ? void 0 : _a.c;
         });
     };
     function getSortedSetUnion(params) {
-        return __awaiter(this, void 0, void 0, function () {
-            var sets, start, stop, weights, aggregate, limit, res;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        sets = params.sets;
-                        start = params.hasOwnProperty('start') ? params.start : 0;
-                        stop = params.hasOwnProperty('stop') ? params.stop : -1;
-                        weights = params.weights || [];
-                        aggregate = params.aggregate || 'SUM';
-                        if (sets.length < weights.length) {
-                            weights = weights.slice(0, sets.length);
-                        }
-                        while (sets.length > weights.length) {
-                            weights.push(1);
-                        }
-                        limit = stop - start + 1;
-                        if (limit <= 0) {
-                            limit = null;
-                        }
-                        return [4 /*yield*/, module.pool.query({
-                                name: "getSortedSetUnion".concat(aggregate).concat(params.sort > 0 ? 'Asc' : 'Desc', "WithScores"),
-                                text: "\nWITH A AS (SELECT z.\"value\",\n                  ".concat(aggregate, "(z.\"score\" * k.\"weight\") \"score\"\n             FROM UNNEST($1::TEXT[], $2::NUMERIC[]) k(\"_key\", \"weight\")\n            INNER JOIN \"legacy_object_live\" o\n                    ON o.\"_key\" = k.\"_key\"\n            INNER JOIN \"legacy_zset\" z\n                    ON o.\"_key\" = z.\"_key\"\n                   AND o.\"type\" = z.\"type\"\n            GROUP BY z.\"value\")\nSELECT A.\"value\",\n       A.\"score\"\n  FROM A\n ORDER BY A.\"score\" ").concat(params.sort > 0 ? 'ASC' : 'DESC', "\n LIMIT $4::INTEGER\nOFFSET $3::INTEGER"),
-                                values: [sets, weights, start, limit]
-                            })];
-                    case 1:
-                        res = _a.sent();
-                        if (params.withScores) {
-                            res.rows = res.rows.map(function (r) { return ({
-                                value: r.value,
-                                score: parseFloat(r.score)
-                            }); });
-                        }
-                        else {
-                            res.rows = res.rows.map(function (r) { return r.value; });
-                        }
-                        return [2 /*return*/, res.rows];
-                }
+        return __awaiter(this, void 0, void 0, function* () {
+            const { sets } = params;
+            const start = params.start || 0;
+            const stop = params.stop || -1;
+            let weights = params.weights || [];
+            const aggregate = params.aggregate || 'SUM';
+            if (sets.length < weights.length) {
+                weights = weights.slice(0, sets.length);
+            }
+            while (sets.length > weights.length) {
+                weights.push(1);
+            }
+            let limit = stop - start + 1;
+            if (limit <= 0) {
+                limit = null;
+            }
+            const res = yield module.pool.query({
+                name: `getSortedSetUnion${aggregate}${params.sort > 0 ? 'Asc' : 'Desc'}WithScores`,
+                text: `
+WITH A AS (SELECT z."value",
+${aggregate}(z."score" * k."weight") "score"
+FROM UNNEST($1::TEXT[], $2::NUMERIC[]) k("_key", "weight")
+INNER JOIN "legacy_object_live" o
+ON o."_key" = k."_key"
+INNER JOIN "legacy_zset" z
+ON o."_key" = z."_key"
+AND o."type" = z."type"
+GROUP BY z."value")
+SELECT A."value",
+A."score"
+FROM A
+ORDER BY A."score" ${params.sort > 0 ? 'ASC' : 'DESC'}
+LIMIT $4::INTEGER
+OFFSET $3::INTEGER`,
+                values: [sets, weights, start, limit],
             });
+            return res.rows.map(r => ({
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                value: r.value,
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                score: params.withScores ? Number(r.score) : undefined,
+            }));
         });
     }
+    module.getSortedSetUnion = function (params) {
+        return __awaiter(this, void 0, void 0, function* () {
+            params.sort = 1;
+            return yield getSortedSetUnion(params);
+        });
+    };
+    module.getSortedSetRevUnion = function (params) {
+        return __awaiter(this, void 0, void 0, function* () {
+            params.sort = -1;
+            return yield getSortedSetUnion(params);
+        });
+    };
 };
